@@ -12,23 +12,31 @@
 
 NAME = fractol
 FLAGS = -Wall -Werror -Wextra -O3
-MLX_FLAGS = -lmlx -framework OpenGl -framework AppKit
+MLX_PATH = ./miniLibX
+MLX_LIB = $(MLX_PATH)/libmlx.a
+MLX_INC = -I $(MLX_PATH)
+MLX_FLAGS = -framework OpenGL -framework AppKit
+
 SRC = fractol.c ft_keys.c ft_initializers.c ft_calculations.c \
 		ft_algorithms.c ft_algorithms_two.c
 OBJ = $(patsubst %.c, %.o, $(SRC))
 
-all: $(NAME)
+all: $(MLX_LIB) $(NAME)
+
 $(NAME): $(OBJ)
-	clang $(FLAGS) $(MLX_FLAGS) -o $(NAME) $(SRC)
-	rm -r $(OBJ)
+	clang $(FLAGS) $(OBJ) $(MLX_LIB) $(MLX_FLAGS) -o $(NAME)
 
 %.o: %.c
-	clang -c $(FLAGS) -o $@ $<
+	clang -c $(FLAGS) $(MLX_INC) -o $@ $<
+
+$(MLX_LIB):
+	$(MAKE) -C $(MLX_PATH)
 
 clean:
 	rm -f $(OBJ)
+	$(MAKE) -C $(MLX_PATH) clean
 
 fclean: clean
-	rm -f $(OBJ) $(NAME)
+	rm -f $(NAME)
 
 re: fclean all
